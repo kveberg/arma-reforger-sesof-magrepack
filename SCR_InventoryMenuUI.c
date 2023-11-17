@@ -62,7 +62,8 @@ modded class SCR_InventoryMenuUI
 		IEntity fromItemEntity, toItemEntity
 		
 		// used later to return false when repacking on a stack, thus enabling the newly fulled mag to find a suitable slot
-		bool repackOnAStack = false;																					
+		bool repackOnAStack = false;	
+		bool repackFromAStack = m_pSelectedSlotUI.IsStacked();																		
 		
 		fromItemEntityComponent = m_pSelectedSlotUI.GetInventoryItemComponent();
 		
@@ -177,6 +178,16 @@ modded class SCR_InventoryMenuUI
 		}
 		if((fromCount + toCount) > maxCount)
 		{
+			//when there is overfill, and you're dragging a mag from a stack of N-full ones to another in another storage, it will return to the stack with wrong ammo count on top.
+			if (repackFromAStack)
+			{
+				m_pCallBack.m_pStorageFrom = m_pSelectedSlotUI.GetStorageUI();
+				m_pCallBack.m_pStorageTo = m_pFocusedSlotUI.GetStorageUI();
+				BaseInventoryStorageComponent pStorageFromComponent = m_pCallBack.m_pStorageFrom.GetCurrentNavigationStorage();
+				BaseInventoryStorageComponent pStorageToComponent = m_pFocusedSlotUI.GetAsStorage();
+				
+				m_InventoryManager.InsertItem( fromItemEntity, pStorageToComponent, pStorageFromComponent, m_pCallBack );
+			}
 			//Print("toMag fills up, and what remains in fromMag is:");
 			//Print((fromCount + toCount) - maxCount);
 			return false;
