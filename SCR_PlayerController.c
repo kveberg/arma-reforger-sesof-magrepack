@@ -18,7 +18,7 @@ modded class SCR_PlayerController
 		
 		if(!storage)
 		{
-			Print("TrainWreck: Was unable to locate storage or manager components", LogLevel.ERROR);
+			Print("Was unable to locate storage or manager components", LogLevel.ERROR);
 			return;
 		}
 		
@@ -32,7 +32,7 @@ modded class SCR_PlayerController
 				// Just print something if for whatever reason we can't add the magazine back
 				if(!managerComp.TryInsertItemInStorage(toEntity, storage))
 				{
-					Print("TrainWreck: Was unable to successfully add packed magazine back into storage", LogLevel.ERROR);
+					Print("Was unable to successfully add packed magazine back into storage", LogLevel.ERROR);
 				}
 			}
 			
@@ -51,7 +51,7 @@ modded class SCR_PlayerController
 				// Just print something if for whatever reason we can't add the magazine back
 				if(!managerComp.TryInsertItemInStorage(toEntity, storage))
 				{
-					Print("TrainWreck: Was unable to successfully add packed magazine back into storage", LogLevel.ERROR);
+					Print("Was unable to successfully add packed magazine back into storage", LogLevel.ERROR);
 				}
 			}
 			
@@ -63,7 +63,7 @@ modded class SCR_PlayerController
 				{
 					if(!managerComp.TryInsertItemInStorage(fromEntity, storage))
 					{
-						Print("TrainWreck: Was unable to successfully add packed magazine back into storage", LogLevel.ERROR);
+						Print("Was unable to successfully add packed magazine back into storage", LogLevel.ERROR);
 					}
 				}
 			}				
