@@ -14,7 +14,8 @@ modded class SCR_PlayerController
 		
 		IEntity fromEntity = fromMag.GetOwner();
 		IEntity toEntity = toMag.GetOwner();
-		BaseInventoryStorageComponent storage = TW<BaseInventoryStorageComponent>.Find(managerComp.GetOwner());
+		IEntity owner = managerComp.GetOwner();
+		BaseInventoryStorageComponent storage = BaseInventoryStorageComponent.Cast(owner.FindComponent(BaseInventoryStorageComponent));
 		
 		if(!storage)
 		{
