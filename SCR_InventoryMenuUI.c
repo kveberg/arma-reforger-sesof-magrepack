@@ -148,33 +148,6 @@ modded class SCR_InventoryMenuUI
 
 		m_InventoryManager.PlayItemSound(toItemEntity, SCR_SoundEvent.SOUND_PICK_UP);
 		
-		
-		/* At this point, it would be nice to just return true. However ... 
-		There are instances where the original method should run to move things and there are instances where it should not. A smooth experience depends upon getting that right.
-		Another problem occurs when repack is conducted across storages, and in particular when references get changed / destroyed along the way. This affects only the 
-		widget that shows the ammoCount of each mag, and that widget is refreshed in the SetSlotVisible()-method. Therefore, run that when there is indeed a widget to run it on.
-		*/
-		
-		if (m_pSelectedSlotUI)
-			m_pSelectedSlotUI.SetSlotVisible(true);
-		if (m_pFocusedSlotUI)
-			m_pFocusedSlotUI.SetSlotVisible(true);
-		
-		if((fromCount + toCount) <= maxCount)
-			return true;
-		
-		//when there is overfill, and you're dragging a mag from a stack of N-full ones to another in another storage, it will return to the stack with wrong ammo count on top.
-		if (repackFromAStack)
-		{
-			m_pCallBack.m_pStorageFrom = m_pSelectedSlotUI.GetStorageUI();
-			m_pCallBack.m_pStorageTo = m_pFocusedSlotUI.GetStorageUI();
-			BaseInventoryStorageComponent pStorageFromComponent = m_pCallBack.m_pStorageFrom.GetCurrentNavigationStorage();
-			BaseInventoryStorageComponent pStorageToComponent = m_pFocusedSlotUI.GetAsStorage();
-				
-			m_InventoryManager.InsertItem( fromItemEntity, pStorageToComponent, pStorageFromComponent, m_pCallBack );
-		}
-		
-		//Print("If you see this you're in trouble.");
-		return false;
+		return true;
 	}	
 };
