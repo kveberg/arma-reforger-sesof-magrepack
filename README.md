@@ -1,2 +1,2 @@
 # arma-reforger-mods
-Modifications to ArmA Reforger written in Enforce Script.
+Enables repacking magazines in ArmA Reforger
