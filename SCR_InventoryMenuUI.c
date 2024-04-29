@@ -1,41 +1,31 @@
+//------------------------------------------------------------------------------------------------
 modded class SCR_InventoryMenuUI
-{	
-
-		
+{
+	// Drag & Drop for M&K-users hook in here.
 	override void MoveItemToStorageSlot()
 	{
-		if (!SESOF_MagRepack())
+		if (!SESOF_MagRepack_Repack())
 		{
 			super.MoveItemToStorageSlot();
 		}
 	}
 
-	
-	bool SESOF_MagRepack()
+	//------------------------------------------------------------------------------------------------
+	//! Checks to ensure we have two magazines that should be repacked, and passes the necessary bits to SESOF_MagRepack_RpcAsk_Repack()-function in SCR_PlayerController
+	bool SESOF_MagRepack_Repack()
 	{
-		/*
-		Checks to ensure we have two magazines that should be repacked, and passes the necessary bits to RplAsk_RepackMags()-function in SCR_PlayerController
+		Print("------- Attempting to repack magazines. -------", LogLevel.NORMAL);
 		
-		Returns true if repacking occurred 
-		Returns true if magwells were incompatible (feels nicer to have them not move.) 					This prevents swapping positions of mags - remove?
-		Returns true if magwells are the same, but toMag is full and no repacking can happen. Feels nicer. 	This prevents swapping positions of mags - remove?
-		Returns true if dropping on same non-stacked slot. Feels nicer.
-			
-		Returns false if dragging from or dropping on an arsenal.
-		Returns false if not dragging a mag onto another mag
-		*/
-		
-			
 		// Make sure we are not repacking arsenals
-		if (IsStorageArsenal(m_pFocusedSlotUI.GetStorageUI().GetCurrentNavigationStorage())) {return false;}
-		if (IsStorageArsenal(m_pSelectedSlotUI.GetStorageUI().GetCurrentNavigationStorage())) {return false;}
-
+		if (IsStorageArsenal(m_pFocusedSlotUI.GetStorageUI().GetCurrentNavigationStorage()))
+			return false;
+		
+		if (IsStorageArsenal(m_pSelectedSlotUI.GetStorageUI().GetCurrentNavigationStorage()))
+			return false;
 		
 		// Make sure we are dragging and dropping a mag onto another mag
 		if (m_pSelectedSlotUI.GetSlotedItemFunction() != ESlotFunction.TYPE_MAGAZINE ||	m_pFocusedSlotUI.GetSlotedItemFunction() != ESlotFunction.TYPE_MAGAZINE)
-			{
-				return false;
-			}								
+			return false;							
 			
 		// Get item components in selected and focused slots, and check they are not the same item
 		InventoryItemComponent fromInventoryItemComponent, toInventoryItemComponent
@@ -44,12 +34,18 @@ modded class SCR_InventoryMenuUI
 		bool repackOnAStack = false;	
 		
 		bool repackFromAStack = m_pSelectedSlotUI.IsStacked();
-		if (repackFromAStack) {Print("Dragged from a stack");}
-		if (!repackFromAStack) {Print("Did not drag from a stack.");}
+		if (repackFromAStack)
+			Print("Dragged from a stack");
+		
+		if (!repackFromAStack)
+			Print("Did not drag from a stack.");
 		
 		bool isToSlotStacked = m_pFocusedSlotUI.IsStacked();
-		if (isToSlotStacked) {Print("Dropped on a stack.");}
-		if (!isToSlotStacked) {Print("Did not drop on a stack.");}
+		if (isToSlotStacked)
+			Print("Dropped on a stack.");
+		
+		if (!isToSlotStacked)
+			Print("Did not drop on a stack.");
 		
 		fromInventoryItemComponent = m_pSelectedSlotUI.GetInventoryItemComponent();
 		fromEntity = fromInventoryItemComponent.GetOwner();
@@ -76,11 +72,9 @@ modded class SCR_InventoryMenuUI
 			else
 			{
 				Print("Dragged and dropped onto the same mag. No repacking.");
-				m_InventoryManager.PlayItemSound(fromEntity, SCR_SoundEvent.SOUND_INV_DROP_ERROR);
-				return true;																										
+				return false;																										
 			}																									
 		}
-		
 		// If we are not dragging and dropping onto the same slot, we can just get the item in the focused slot directly
 		else
 		{
@@ -97,40 +91,48 @@ modded class SCR_InventoryMenuUI
 		}																		
 		
 		// If we somehow failed to get two items at this point, no repacking should occur
-		if (!fromEntity){Print("Failed to acquire fromEntity!", LogLevel.ERROR);}
-		if (!toEntity){Print("Failed to acquire toEntity!", LogLevel.ERROR);}
-		if (!fromEntity || !toEntity){return false;}
+		if (!fromEntity)
+			Print("Failed to acquire fromEntity!", LogLevel.ERROR);
+		
+		if (!toEntity)
+			Print("Failed to acquire toEntity!", LogLevel.ERROR);
+		
+		if (!fromEntity || !toEntity)
+			return false;
 		
 		
 		// We now have two mags, and can see if they are compatible to repack
 		MagazineComponent fromMag = MagazineComponent.Cast(fromEntity.FindComponent(MagazineComponent));	
 		MagazineComponent toMag = MagazineComponent.Cast(toEntity.FindComponent(MagazineComponent));
 		
-		if (!fromMag){Print("Failed to acquire fromMag!", LogLevel.ERROR);}
-		if (!toMag){Print("Failed to acquire toMag!", LogLevel.ERROR);}
-		if (!fromMag || !toMag){return false;}
+		if (!fromMag)
+			Print("Failed to acquire fromMag!", LogLevel.ERROR);
+		
+		if (!toMag)
+			Print("Failed to acquire toMag!", LogLevel.ERROR);
+		
+		if (!fromMag || !toMag)
+			return false;
 		
 		if (fromMag.GetMagazineWell().Type() != toMag.GetMagazineWell().Type())							
 		{
 			Print("Incompatible MagazineWells.");
-			SCR_UISoundEntity.SoundEvent(SCR_SoundEvent.SOUND_INV_DROP_ERROR);
 			return false;
 		}
 		
 			 
 		// If both magazines are full 
-		if(toMag.GetAmmoCount() == toMag.GetMaxAmmoCount() && fromMag.GetAmmoCount() == fromMag.GetMaxAmmoCount())
+		if (toMag.GetAmmoCount() == toMag.GetMaxAmmoCount() && fromMag.GetAmmoCount() == fromMag.GetMaxAmmoCount())
 		{				
-			Print("toMag & fromMag are both full, so this should be a regular attempted move.");
+			Print("toMag & fromMag are both full. No repacking.");
 			return false;
 		}
 		
 		
 		// If we're dragging onto a full mag then there will not be any repacking
-		if(toMag.GetAmmoCount() == toMag.GetMaxAmmoCount())
+		if (toMag.GetAmmoCount() == toMag.GetMaxAmmoCount())
 		{				
 			Print("toMag is full. No repacking.");
-			m_InventoryManager.PlayItemSound(fromEntity, SCR_SoundEvent.SOUND_INV_DROP_ERROR);
 			return false;
 		}
 		
@@ -139,7 +141,7 @@ modded class SCR_InventoryMenuUI
 		--------------------------------------------------------------------------------------------------------------------------------
 			REPACK
 			Repacking should indeed occur, but that can only be done on the master ... so rpl time. 
-			We need to pass the inventorymanager along with the storages and mags involved to SESOF_SCR_PlayerController.c
+			We need to pass the inventorymanager along with the storages and mags involved to SCR_PlayerController.c
 			where we can do that.
 		--------------------------------------------------------------------------------------------------------------------------------
 		*/ 
@@ -159,11 +161,11 @@ modded class SCR_InventoryMenuUI
 		
 		if (rpl.IsMaster())
 		{
-			m_PlayerController.RepackMags(fromMag, toMag, m_InventoryManager, toItemStorageComponent, fromItemStorageComponent);
+			m_PlayerController.SESOF_MagRepack_Repack(fromMag, toMag, m_InventoryManager, toItemStorageComponent, fromItemStorageComponent);
 		}
 		else
 		{
-			m_PlayerController.Rpc(m_PlayerController.RpcAsk_RepackMags, 
+			m_PlayerController.Rpc(m_PlayerController.SESOF_MagRepack_RpcAsk_Repack, 
 				Replication.FindId(fromMag), 
 				Replication.FindId(toMag),
 				Replication.FindId(m_InventoryManager),
@@ -173,7 +175,7 @@ modded class SCR_InventoryMenuUI
 		}
 		
 		// Repacking complete. Refresh visuals and play sound to indicate success.
-		
+
 		m_pCallBack.m_pStorageTo.Refresh();
 		m_pCallBack.m_pStorageFrom.Refresh();
 
@@ -182,4 +184,4 @@ modded class SCR_InventoryMenuUI
 		return true;
 	}
 
-};
+}
