@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------------------------
-modded class SCR_InventoryMenuUI
+modded class SCR_InventoryMenuUI : ChimeraMenuBase
 {
 	// Drag & Drop for M&K-users hook in here.
 	override void MoveItemToStorageSlot()
@@ -55,7 +55,7 @@ modded class SCR_InventoryMenuUI
 		{
 			if (m_pFocusedSlotUI.IsStacked())
 			{	
-				ref array<IEntity> items = {};
+				array<IEntity> items = {};
 				
 				// The array will fill with items in order
 				GetInventoryStorageManager().GetItems(items);
