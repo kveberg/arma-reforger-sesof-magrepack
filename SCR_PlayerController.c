@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------------------------
-modded class SCR_PlayerController
+modded class SCR_PlayerController : PlayerControllerClass
 {
 	//------------------------------------------------------------------------------------------------
 	void SESOF_MagRepack_Repack(MagazineComponent fromMag, MagazineComponent toMag, SCR_InventoryStorageManagerComponent managerComp, BaseInventoryStorageComponent storageTo, BaseInventoryStorageComponent storageFrom)
